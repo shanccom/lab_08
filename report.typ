@@ -2,14 +2,15 @@
 #import "components/code-block.typ": code-block
 
 #show: unsa-report.with(
-  course_name: "Ingeniería de Software",
-  lab_title: "Título de la Práctica",
-  lab_number: "01",
-  instructor_name: "Nombre del Docente",
+  course_name: "Pruebas de Software",
+  lab_title: "Pruebas de Integracion: API Testing con Postman y Supertest",
+  lab_number: "08",
+  instructor_name: "Profe. Robert Arisaca",
   members: (
-    "Apellidos1 Apellidos1 Nombres1 Nombres1",
-    "Apellidos2 Apellidos2 Nombres2 Nombres2",
-    "Apellidos3 Apellidos3 Nombres3 Nombres3",
+    "Barrios Medina, Mathias Alonso",
+    "Cuno Salazar, Eduardo Joel",
+    "Hancco Mullisaca, Sergio Danilo",
+    "Suclle Suca, Michael Benjamin",
   ),
 )
 

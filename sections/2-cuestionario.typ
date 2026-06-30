@@ -5,4 +5,8 @@
   #set par(justify: true)
 
   #include "2-cuestionario/pregunta-1.typ"
+  #include "2-cuestionario/pregunta-2.typ"
+  #include "2-cuestionario/pregunta-3.typ"
+  #include "2-cuestionario/pregunta-4.typ"
+  #include "2-cuestionario/pregunta-5.typ"
 ]
