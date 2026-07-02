@@ -109,3 +109,7 @@ El servidor corre en #link("http://localhost:3000")[http://localhost:3000].
 - Servidor en ejecución: Completado
 - Pruebas manuales Postman: Completado
 - Capturas de evidencias: Completado
+
+=== Test:
+
+- Continuando con la parte de test ahora procederemos a aplicar lo que paso
