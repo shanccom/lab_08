@@ -19,7 +19,7 @@ El grupo debe aplicar pruebas de integración sobre la arquitectura de su proyec
 
 === I. Mapeo de la Frontera
 
-El proyecto final es un monorepo #emph("Actual Budget") con 13 paquetes, desarrollado en TypeScript. La arquitectura se compone de:
+El proyecto final es un monorepo *Actual Budget* con 13 paquetes, desarrollado en TypeScript. La arquitectura se compone de:
 
 - *Subsistema A — Frontend:* Aplicación React + Vite (desktop-client, puerto 3001).
 - *Subsistema B — Sync Server:* Servidor Express (sync-server, puerto 5006) que gestiona sincronización CRDT mediante Protocol Buffers.
@@ -32,7 +32,7 @@ La *frontera de integración* seleccionada para las pruebas es la interfaz HTTP 
   caption: [Diagrama de arquitectura del proyecto final]
 )
 
-*Punto de entrega de datos:* El frontend envía requests HTTP (JSON o binario Protobuf) al Sync Server, el cual valida la sesión mediante el middleware #emph("validateSessionMiddleware"), procesa la solicitud a través de handlers como #emph("app-sync.ts") y responde con códigos de estado y payloads JSON.
+*Punto de entrega de datos:* El frontend envía requests HTTP (JSON o binario Protobuf) al Sync Server, el cual valida la sesión mediante el middleware `validateSessionMiddleware`, procesa la solicitud a través de handlers como `app-sync.ts` y responde con códigos de estado y payloads JSON.
 
 *Endpoints testeados:*
 
@@ -43,7 +43,7 @@ La *frontera de integración* seleccionada para las pruebas es la interfaz HTTP 
 
 *Herramienta seleccionada:* Supertest + Vitest, aprovechando que el proyecto ya cuenta con dicha infraestructura de testing. Las pruebas se ejecutan en memoria contra la app Express exportada, sin necesidad de levantar un servidor real. La base de datos SQLite es real (better-sqlite3), no mockeada.
 
-*Archivo de pruebas creado:* #emph("packages/sync-server/src/app-sync-integration.test.ts") (25 tests).
+*Archivo de pruebas creado:* `packages/sync-server/src/app-sync-integration.test.ts` (25 tests).
 
 === II. Inyección de Fallas de Interfaz
 
@@ -61,19 +61,19 @@ Se diseñaron 10 casos de prueba orientados a romper la comunicación mediante e
 #table(
   columns: (auto, auto, auto, auto, auto),
   [*ID*], [*Endpoint*], [*Entrada*], [*Esperado*], [*Real*],
-  [SYN-01], [/user-get-key], [Body vacío (sin fileId)], [400 "invalid fileId"], [400 — coincide],
-  [SYN-02], [/user-get-key], [{ fileId: 12345 } (number)], [400 "invalid fileId"], [400 — coincide],
-  [SYN-03], [/user-get-key], [fileId con caracteres especiales], [400 "invalid fileId"], [400 — coincide],
-  [SYN-04], [/user-get-key], [{ fileId: "" } (string vacío)], [400 "invalid fileId"], [400 — coincide],
-  [SYN-05], [/user-create-key], [Body sin fileId], [400 "invalid fileId"], [400 — coincide],
-  [SYN-06], [/sync], [String crudo no Protobuf], [500 internal-error], [500 — coincide],
-  [SYN-07], [/sync], [Protobuf válido pero since=""], [422 "since-required"], [422 — coincide],
-  [SYN-08], [/delete-user-file], [Body vacío {}], [422 "fileId-required"], [422 — coincide],
-  [SYN-09], [/upload-user-file], [Sin header x-actual-name], [400 "name is required"], [400 — coincide],
-  [SYN-10], [/upload-user-file], [Sin header x-actual-file-id], [400 "fileId is required"], [400 — coincide],
+  [SYN-01], [/user-get-key], [Body vacío (sin fileId)], [400 "invalid fileId"], [Correcto],
+  [SYN-02], [/user-get-key], [{ fileId: 12345 } (number)], [400 "invalid fileId"], [Correcto],
+  [SYN-03], [/user-get-key], [fileId con caracteres especiales], [400 "invalid fileId"], [Correcto],
+  [SYN-04], [/user-get-key], [{ fileId: "" } (string vacío)], [400 "invalid fileId"], [Correcto],
+  [SYN-05], [/user-create-key], [Body sin fileId], [400 "invalid fileId"], [Correcto],
+  [SYN-06], [/sync], [String crudo no Protobuf], [500 internal-error], [Correcto],
+  [SYN-07], [/sync], [Protobuf válido pero since=""], [422 "since-required"], [Correcto],
+  [SYN-08], [/delete-user-file], [Body vacío {}], [422 "fileId-required"], [Correcto],
+  [SYN-09], [/upload-user-file], [Sin header x-actual-name], [400 "name is required"], [Correcto],
+  [SYN-10], [/upload-user-file], [Sin header x-actual-file-id], [400 "fileId is required"], [Correcto],
 )
 
-*Análisis:* Todos los casos sintácticos fueron manejados correctamente por el servidor. El middleware #emph("verifyFileExists()") rechaza tipos no string con #emph("typeof fileId !== 'string'"), y el sistema de parseo de Protobuf captura la excepción #emph("illegal tag") para cuerpos inválidos. No se encontraron fallas en este nivel.
+*Análisis:* Todos los casos sintácticos fueron manejados correctamente por el servidor. El middleware `verifyFileExists()` rechaza tipos no string con `typeof fileId !== 'string'`, y el parser de Protobuf captura la excepción *illegal tag* para cuerpos inválidos. No se encontraron fallas en este nivel.
 
 ==== 2.2 Caso 2 — Fallas Semánticas
 
@@ -89,19 +89,19 @@ Se diseñaron 8 casos de prueba con valores legalmente válidos pero ilógicos p
 #table(
   columns: (auto, auto, auto, auto, auto, auto),
   [*ID*], [*Endpoint*], [*Entrada*], [*Esperado*], [*Real*], [*¿Falla?*],
-  [SEM-01], [/sync], [groupId no coincide con BD], [400 "file-has-reset"], [400 — coincide], [No],
-  [SEM-02], [/sync], [groupId=NULL en BD (archivo reseteado)], [400 "file-needs-upload"], [400 — coincide], [No],
-  [SEM-03], [/sync], [keyId no coincide con BD (cifrado cambiado)], [400 "file-has-new-key"], [400 — coincide], [No],
-  [SEM-04], [/sync], [syncVersion=1 (formato obsoleto)], [400 "file-old-version"], [400 — coincide], [No],
-  [SEM-05], [/user-get-key], [Usuario BASIC accede a archivo ajeno], [403 "not allowed"], [403 — coincide], [No],
-  [SEM-06], [/user-get-key], [Usuario ADMIN accede a archivo ajeno], [200 acceso permitido], [200 — coincide], [No],
-  [SEM-07], [/delete-user-file], [Archivo ya eliminado (deleted=1)], [400 "file-not-found"], [400 — defecto de diseño], [*Sí*],
-  [SEM-08], [/upload-user-file], [groupId enviado no coincide con BD], [400 "file-has-reset"], [400 — coincide], [No],
+  [SEM-01], [/sync], [groupId no coincide con BD], [400 "file-has-reset"], [Correcto], [No],
+  [SEM-02], [/sync], [groupId=NULL en BD (archivo reseteado)], [400 "file-needs-upload"], [Correcto], [No],
+  [SEM-03], [/sync], [keyId no coincide con BD (cifrado cambiado)], [400 "file-has-new-key"], [Correcto], [No],
+  [SEM-04], [/sync], [syncVersion=1 (formato obsoleto)], [400 "file-old-version"], [Correcto], [No],
+  [SEM-05], [/user-get-key], [Usuario BASIC accede a archivo ajeno], [403 "not allowed"], [Correcto], [No],
+  [SEM-06], [/user-get-key], [Usuario ADMIN accede a archivo ajeno], [200 acceso permitido], [Correcto], [No],
+  [SEM-07], [/delete-user-file], [Archivo ya eliminado (deleted=1)], [400 "file-not-found"], [No idempotente], [Sí],
+  [SEM-08], [/upload-user-file], [groupId enviado no coincide con BD], [400 "file-has-reset"], [Correcto], [No],
 )
 
 *Defecto encontrado — SEM-07:*
 
-#emph("FilesService.get()") en #emph("files-service.ts") lanza #emph("FileNotFound") tanto para archivos que nunca existieron como para archivos marcados con #emph("deleted=1"). Esto hace que la operación DELETE no sea idempotente a nivel de API: un segundo DELETE retorna 400 en lugar de 200 (o 404). El sistema no distingue entre "no existe" y "existe pero está eliminado".
+El método `FilesService.get()` en `files-service.ts` lanza `FileNotFound` tanto para archivos que nunca existieron como para archivos marcados con `deleted=1`. Esto hace que la operación DELETE no sea idempotente a nivel de API: un segundo DELETE retorna 400 en lugar de 200 (o 404). El sistema no distingue entre "no existe" y "existe pero está eliminado".
 
 *Código relevante (files-service.ts:139-146):*
 #figure(
@@ -109,7 +109,7 @@ Se diseñaron 8 casos de prueba con valores legalmente válidos pero ilógicos p
   caption: [Código fuente del defecto SEM-07]
 )
 
-*Recomendación:* Modificar #emph("FilesService.get()") para retornar errores diferenciados (ej. #emph("FileDeleted") vs #emph("FileNotFound")) y hacer que el endpoint DELETE sea idempotente.
+*Recomendación:* Modificar `FilesService.get()` para retornar errores diferenciados (ej. `FileDeleted` vs `FileNotFound`) y hacer que el endpoint DELETE sea idempotente.
 
 ==== 2.3 Caso 3 — Resiliencia
 
@@ -133,9 +133,9 @@ Se diseñaron 6 casos de prueba para evaluar la capacidad del Sync Server de res
   [RES-06], [/user-get-key], [Sin token de autenticación], [\<100ms (rechazo temprano)], [\<100ms — OK],
 )
 
-*Análisis:* Todas las rutas responden rápidamente en condiciones normales con SQLite local. El middleware #emph("validateSessionMiddleware") rechaza solicitudes sin token antes de tocar la base de datos, lo cual es una buena práctica de defensa temprana. Sin embargo, los handlers no implementan timeouts explícitos ni #emph("circuit breakers"). Si la base de datos llegara a bloquearse, las requests quedarían colgadas indefinidamente.
+*Análisis:* Todas las rutas responden rápidamente en condiciones normales con SQLite local. El middleware `validateSessionMiddleware` rechaza solicitudes sin token antes de tocar la base de datos, lo cual es una buena práctica de defensa temprana. Sin embargo, los handlers no implementan timeouts explícitos ni circuit breakers. Si la base de datos llegara a bloquearse, las requests quedarían colgadas indefinidamente.
 
-*Recomendación:* Implementar un mecanismo de timeout con #emph("Promise.race") en cada handler y exponer un timeout configurable. Considerar agregar un health check independiente para el estado de la base de datos.
+*Recomendación:* Implementar un mecanismo de timeout con `Promise.race` en cada handler y exponer un timeout configurable. Considerar agregar un health check independiente para el estado de la base de datos.
 
 === III. Resultados de Ejecución
 
@@ -144,9 +144,9 @@ Se diseñaron 6 casos de prueba para evaluar la capacidad del Sync Server de res
   caption: [Ejecución completa: 25 tests pasados, 568 tests totales del proyecto]
 )
 
-Los 25 tests de integración se ejecutaron exitosamente en #emph("263ms"). Se integraron sin conflictos con los 543 tests existentes del proyecto (45 test files, 568 tests totales).
+Los 25 tests de integración se ejecutaron exitosamente en 263ms. Se integraron sin conflictos con los 543 tests existentes del proyecto (45 test files, 568 tests totales).
 
-*Herramientas utilizadas:* Supertest (HTTP assertions) + Vitest (runner/assertions). Base de datos SQLite real con usuarios y sesiones predefinidos en #emph("globalSetup").
+*Herramientas utilizadas:* Supertest (HTTP assertions) + Vitest (runner/assertions). Base de datos SQLite real con usuarios y sesiones predefinidos en `globalSetup`.
 
 === IV. Resumen de Hallazgos
 

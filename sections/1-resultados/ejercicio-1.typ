@@ -61,7 +61,7 @@ El servidor corre en #link("http://localhost:3000")[http://localhost:3000].
 
 ==== 4.1. Crear Videojuego - POST
 
-Se envió una solicitud #emph("POST") a #raw("/videojuegos") con un cuerpo JSON que contiene los campos #emph("nombre"), #emph("genero"), #emph("stock") y #emph("precio"). El servidor validó los datos, asignó un ID único al recurso automáticamente y respondió con el código #strong("201 Created") y el objeto del videojuego creado.
+Se envió un POST a `/videojuegos` con un cuerpo JSON conteniendo los campos nombre, género, stock y precio. El servidor validó los datos, asignó un ID único automáticamente y respondió con 201 Created junto con el objeto del videojuego creado.
 
 #figure(
   image("/img/postman_post_crear_videojuego.png", width: 80%),
@@ -70,7 +70,7 @@ Se envió una solicitud #emph("POST") a #raw("/videojuegos") con un cuerpo JSON 
 
 ==== 4.2. Leer Videojuego - GET
 
-Se realizó una solicitud #emph("GET") a #raw("/videojuegos/1") utilizando el ID del videojuego creado previamente. El servidor buscó el recurso en el arreglo en memoria y, al encontrarlo, respondió con el código #strong("200 OK") y los datos completos del videojuego en el cuerpo de la respuesta.
+A continuación consultamos el recurso recién creado haciendo un GET a `/videojuegos/1` con el ID asignado. El servidor lo encontró en el arreglo en memoria y devolvió 200 OK con los datos completos del videojuego.
 
 #figure(
   image("/img/postman_get_leer_videojuego.png", width: 80%),
@@ -79,7 +79,7 @@ Se realizó una solicitud #emph("GET") a #raw("/videojuegos/1") utilizando el ID
 
 ==== 4.3. Actualizar Stock - PUT
 
-Se envió una solicitud #emph("PUT") a #raw("/videojuegos/1/stock") con un cuerpo JSON que contiene el nuevo valor de #emph("stock"). El servidor validó que el valor sea numérico y no negativo, localizó el videojuego por su ID y actualizó la propiedad. Respondió con el código #strong("200 OK") y el objeto del videojuego con el stock modificado.
+Probamos modificar el stock del videojuego con un PUT a `/videojuegos/1/stock` enviando el nuevo valor en el cuerpo. El servidor validó que fuera numérico y no negativo, localizó el recurso por su ID y actualizó la propiedad. Respondió con 200 OK y el objeto con el stock modificado.
 
 #figure(
   image("/img/postman_put_actualizar_stock.png", width: 80%),
@@ -88,7 +88,7 @@ Se envió una solicitud #emph("PUT") a #raw("/videojuegos/1/stock") con un cuerp
 
 ==== 4.4. Eliminar Videojuego - DELETE
 
-Se ejecutó una solicitud #emph("DELETE") a #raw("/videojuegos/1"). El servidor buscó el videojuego por su ID, lo eliminó del arreglo en memoria y respondió con el código #strong("200 OK") y un mensaje de confirmación.
+Luego ejecutamos un DELETE a `/videojuegos/1`. El servidor buscó el videojuego por su ID, lo eliminó del arreglo en memoria y respondió con 200 OK junto con un mensaje de confirmación.
 
 #figure(
   image("/img/postman_delete_eliminar_videojuego.png", width: 80%),
@@ -97,7 +97,7 @@ Se ejecutó una solicitud #emph("DELETE") a #raw("/videojuegos/1"). El servidor 
 
 ==== 4.5. Verificar Recurso Eliminado - GET 404
 
-Para confirmar la eliminación, se realizó una solicitud #emph("GET") a #raw("/videojuegos/1") sobre el mismo ID eliminado. El servidor no encontró el recurso y respondió con el código #strong("404 Not Found") y un mensaje de error indicando que el videojuego no existe.
+Para confirmar la eliminación, hicimos un GET a `/videojuegos/1` sobre el mismo ID. El servidor no encontró el recurso y respondió con 404 Not Found junto con el mensaje "Videojuego no encontrado".
 
 #figure(
   image("/img/postman_get_404_no_encontrado.png", width: 80%),
@@ -106,14 +106,14 @@ Para confirmar la eliminación, se realizó una solicitud #emph("GET") a #raw("/
 
 ==== 4.6. Validaciones - Errores 400
 
-Se probaron los casos borde del endpoint POST. Al enviar un valor de tipo texto en el campo #emph("stock") (por ejemplo, `"diez"` en lugar de un número), el servidor detectó el tipo inválido y respondió con el código #strong("400 Bad Request") y el mensaje correspondiente.
+Probamos los casos borde del endpoint POST. Al enviar un valor de tipo texto en el campo stock (por ejemplo, `"diez"` en lugar de un número), el servidor detectó el tipo inválido y respondió con 400 Bad Request y el mensaje correspondiente.
 
 #figure(
   image("/img/postman_error_400_texto_en_stock.png", width: 80%),
   caption: [Resultado: Status 400, "Stock y precio deben ser valores numéricos"]
 )
 
-De igual forma, al omitir un campo obligatorio como #emph("nombre"), el servidor validó su ausencia y respondió con #strong("400 Bad Request") indicando que todos los campos son obligatorios.
+De igual forma, al omitir un campo obligatorio como nombre, el servidor validó su ausencia y respondió con 400 Bad Request indicando que todos los campos son obligatorios.
 
 #figure(
   image("/img/postman_error_400_campo_faltante.png", width: 80%),
@@ -173,10 +173,10 @@ A continuación se detalla cada caso de prueba implementado, organizado por cate
 
   // ---- Persistencia Cruzada ----
   block(fill: rgb("#E8F5E9"), inset: 0.7em, radius: 6pt)[
-    #text(weight: "bold", size: 9pt)[#strong["Persistencia Cruzada"] (1 test)]
+    #text(weight: "bold", size: 9pt)[Persistencia Cruzada (1 test)]
 
     - *Objetivo:* Validar que el ID generado en un POST puede usarse como puente para un GET posterior.
-    - *Flujo:* Se envía un POST con los datos de un videojuego válido (nombre, genero, stock, precio). El servidor asigna un ID numérico automáticamente y responde con #strong("201 Created"). Luego se toma ese ID y se consulta con un GET, esperando #strong("200 OK") y que todos los campos coincidan exactamente con los enviados.
+    - *Flujo:* Se envía un POST con los datos de un videojuego válido (nombre, genero, stock, precio). El servidor asigna un ID numérico automáticamente y responde con 201 Created. Luego se toma ese ID y se consulta con un GET, esperando 200 OK y que todos los campos coincidan exactamente con los enviados.
     - *Verificaciones clave:*
       - Código de estado 201 en POST y 200 en GET.
       - El ID generado es un número y está definido.
@@ -185,7 +185,7 @@ A continuación se detalla cada caso de prueba implementado, organizado por cate
 
   // ---- Modificación de Estado ----
   block(fill: rgb("#E3F2FD"), inset: 0.7em, radius: 6pt)[
-    #text(weight: "bold", size: 9pt)[#strong["Modificación de Estado"] (1 test)]
+    #text(weight: "bold", size: 9pt)[Modificación de Estado (1 test)]
 
     - *Objetivo:* Verificar que al modificar el stock mediante PUT, el cambio se consolida en la persistencia y puede verificarse con un GET posterior.
     - *Flujo:* Se crea un videojuego con stock inicial 5. Se envía un PUT a #raw("/videojuegos/:id/stock") con stock = 50. Se confirma que la respuesta del PUT ya refleja el nuevo stock. Luego se realiza un GET para verificar que el cambio persistió.
@@ -197,28 +197,28 @@ A continuación se detalla cada caso de prueba implementado, organizado por cate
 
   // ---- Validación de Robustez ----
   block(fill: rgb("#FFF3E0"), inset: 0.7em, radius: 6pt)[
-    #text(weight: "bold", size: 9pt)[#strong["Validación de Robustez"] (3 tests)]
+    #text(weight: "bold", size: 9pt)[Validación de Robustez (3 tests)]
 
     Se probaron 3 escenarios de datos inválidos en el endpoint POST:
 
-    - *Texto en campo numérico:* Enviar `stock: "diez"` (string en lugar de número). El servidor detecta el tipo incorrecto y rechaza con #strong("400 Bad Request") y el mensaje `"Stock y precio deben ser valores numéricos"`.
+    - *Texto en campo numérico:* Enviar `stock: "diez"` (string en lugar de número). El servidor detecta el tipo incorrecto y rechaza con 400 Bad Request y el mensaje `"Stock y precio deben ser valores numéricos"`.
 
-    - *Campos obligatorios faltantes:* Enviar solo `nombre` y `genero`, omitiendo `stock` y `precio`. El servidor responde con #strong("400 Bad Request") y el mensaje `"Todos los campos son obligatorios: nombre, genero, stock, precio"`.
+    - *Campos obligatorios faltantes:* Enviar solo `nombre` y `genero`, omitiendo `stock` y `precio`. El servidor responde con 400 Bad Request y el mensaje `"Todos los campos son obligatorios: nombre, genero, stock, precio"`.
 
-    - *Valores negativos:* Enviar `stock: -5`. El servidor rechaza con #strong("400 Bad Request") y el mensaje `"Stock y precio deben ser mayores o iguales a 0"`.
+    - *Valores negativos:* Enviar `stock: -5`. El servidor rechaza con 400 Bad Request y el mensaje `"Stock y precio deben ser mayores o iguales a 0"`.
   ],
 
   // ---- Manejo de 404 ----
   block(fill: rgb("#F3E5F5"), inset: 0.7em, radius: 6pt)[
-    #text(weight: "bold", size: 9pt)[#strong["Manejo de 404 y otros escenarios"] (5 tests)]
+    #text(weight: "bold", size: 9pt)[Manejo de 404 y otros escenarios (5 tests)]
 
     Se verificaron operaciones sobre recursos inexistentes y validaciones adicionales:
 
-    - #strong("GET con ID inexistente:"): Consultar #raw("/videojuegos/9999") retorna #strong("404 Not Found") con mensaje `"Videojuego no encontrado"`.
-    - #strong("PUT stock con ID inexistente:"): Actualizar stock de un ID que no existe retorna #strong("404").
-    - #strong("PUT stock con valor no numérico:"): Sobre un ID existente, enviar `stock: "diez"` retorna #strong("400") con mensaje `"Stock debe ser un número mayor o igual a 0"`.
-    - #strong("DELETE con ID inexistente:"): Eliminar un ID que no existe retorna #strong("404").
-    - #strong("DELETE + GET:"): Eliminar un videojuego existente (200) y luego consultarlo confirma que ya no existe (404).
+    - *GET con ID inexistente:* Consultar `/videojuegos/9999` retorna 404 Not Found con mensaje `"Videojuego no encontrado"`.
+    - *PUT stock con ID inexistente:* Actualizar stock de un ID que no existe retorna 404.
+    - *PUT stock con valor no numérico:* Sobre un ID existente, enviar `stock: "diez"` retorna 400 con mensaje `"Stock debe ser un número mayor o igual a 0"`.
+    - *DELETE con ID inexistente:* Eliminar un ID que no existe retorna 404.
+    - *DELETE + GET:* Eliminar un videojuego existente (200) y luego consultarlo confirma que ya no existe (404).
   ],
 )
 
@@ -228,11 +228,11 @@ A continuación se detalla cada caso de prueba implementado, organizado por cate
 
 #code-block(file: "src/ejercicio-1/videojuegos.test.js", snippet: "estructura", lang: "javascript", text-size: 7pt)
 
-*Persistencia cruzada (POST #strong[→] GET):*
+*Persistencia cruzada (POST → GET):*
 
 #code-block(file: "src/ejercicio-1/videojuegos.test.js", snippet: "persistencia-cruzada", lang: "javascript", text-size: 7pt)
 
-*Simulación de modificación de estado (POST #strong[→] PUT stock #strong[→] GET):*
+*Simulación de modificación de estado (POST → PUT stock → GET):*
 
 #code-block(file: "src/ejercicio-1/videojuegos.test.js", snippet: "modificacion-estado", lang: "javascript", text-size: 7pt)
 
@@ -249,4 +249,4 @@ Se ejecutó la suite con el comando #raw("npm test") obteniendo los siguientes r
   caption: [Resultado: 10 de 10 tests pasaron]
 )
 
-*Resumen final:* #strong("10/10 tests pasaron"), todas las pruebas de integración fueron superadas exitosamente, cubriendo persistencia cruzada, modificación de estado y validación de robustez.
+*Resumen final:* Los 10 tests pasaron correctamente, cubriendo persistencia cruzada, modificación de estado y validación de robustez.
